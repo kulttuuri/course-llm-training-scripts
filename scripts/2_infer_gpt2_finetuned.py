@@ -2,16 +2,23 @@ import torchvision
 torchvision.disable_beta_transforms_warning()  # Disable torchvision warnings
 
 from transformers import GPT2LMHeadModel, AutoTokenizer
+from peft import PeftModel  # Import PeftModel to load LoRA weights
 
-# Load the model and tokenizer
-model = GPT2LMHeadModel.from_pretrained("./gpt2_lora_finetuned").to("cuda")
+# Load the base GPT-2 model
+base_model = GPT2LMHeadModel.from_pretrained("gpt2").to("cuda")
+
+# Load the LoRA fine-tuned adapter
+model = PeftModel.from_pretrained(base_model, "./gpt2_lora_finetuned").to("cuda")
+
+# Load the tokenizer
 tokenizer = AutoTokenizer.from_pretrained("./gpt2_lora_finetuned")
+
 # Add a new pad_token if not already set
 if tokenizer.pad_token is None:
     tokenizer.add_special_tokens({'pad_token': '[PAD]'})
     model.resize_token_embeddings(len(tokenizer))  # Resize embeddings to include the new token
 
-print("Model is ready. Type your prompt and press Enter. Type 'exit' to quit.")
+print("LoRA fine-tuned model is ready. Type your prompt and press Enter. Type 'exit' to quit.")
 
 while True:
     # Wait for user input
@@ -25,8 +32,8 @@ while True:
     # Tokenize the input and compute attention mask
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True).to("cuda")
 
-    # Generate text with proper attention mask and pad_token_id
-    outputs = model.generate(
+    # Generate text using the underlying base model
+    outputs = model.base_model.generate(  # Fix applied here
         inputs["input_ids"],
         attention_mask=inputs["attention_mask"],  # Explicitly pass attention_mask
         max_length=128,
