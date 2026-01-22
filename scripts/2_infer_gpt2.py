@@ -1,7 +1,3 @@
-# Silence warnings about torchvision
-import torchvision
-torchvision.disable_beta_transforms_warning()
-
 import time
 from transformers import GPT2LMHeadModel, AutoTokenizer
 

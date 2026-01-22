@@ -1,7 +1,3 @@
-# Silence warnings about torchvision
-import torchvision
-torchvision.disable_beta_transforms_warning()
-
 from datasets import load_dataset
 from transformers import AutoTokenizer, GPT2Config, GPT2LMHeadModel
 from torch.optim import AdamW

@@ -1,6 +1,3 @@
-import torchvision
-torchvision.disable_beta_transforms_warning()  # Disable torchvision warnings
-
 from transformers import GPT2LMHeadModel, AutoTokenizer
 
 # Load the model and tokenizer
